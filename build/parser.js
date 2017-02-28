@@ -24,7 +24,7 @@ function loadFile(file) {
       if (err) {
         reject(err);
       } else {
-        resolve(result.toString());
+        resolve(result);
       }
     });
   });
@@ -107,7 +107,7 @@ function resolveModule(opts, parser, jsFile) {
   var content = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
   return loadFile(jsFile, content).then(function (content) {
-    return [content, parser(content)];
+    return [content, parser(content.toString())];
   });
 }
 
@@ -137,7 +137,7 @@ function createGraphFromFileHelper(sign, resolveFile, buildTree, g, jsFile) {
 
 function loadJSON(file) {
   return loadFile(file).then(function (cnt) {
-    return JSON.parse(cnt);
+    return JSON.parse(cnt.toString());
   });
 }
 
