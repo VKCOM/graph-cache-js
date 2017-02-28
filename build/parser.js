@@ -12,6 +12,18 @@ var _require = require('acorn/dist/walk'),
 
 var memoize = require('lodash.memoize');
 
+function fileExist(path) {
+  return new Promise(function (resolve, reject) {
+    fs.stat(path, function (err, stats) {
+      if (err) {
+        resolve(false);
+      } else {
+        resolve(stats.isFile());
+      }
+    });
+  });
+}
+
 // TODO: resolving files with webpack options
 function loadFile(file) {
   var cnt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -55,7 +67,18 @@ function resolveName(opts, loadPackageFile, curFile, depFile) {
     if (!path.extname(depFile)) {
       extName = '.js';
     }
-    return Promise.resolve(path.resolve(path.dirname(curFile), depFile) + extName);
+    var candidate = path.resolve(path.dirname(curFile), depFile) + extName;
+    if (extName === '') {
+      return fileExist(candidate).then(function (result) {
+        if (result) {
+          return candidate;
+        } else {
+          return candidate + '.js';
+        }
+      });
+    } else {
+      return Promise.resolve(candidate);
+    }
   }
 
   if (opts.packageJSON) {
@@ -71,7 +94,7 @@ function resolveName(opts, loadPackageFile, curFile, depFile) {
   return Promise.reject(cantResolveError(depFile));
 }
 
-function buildTree(resolveName, content, ast, g, filePath) {
+function buildTree(resolveName, ast, g, filePath) {
   var state = [];
   simple(ast, {
     ImportDeclaration: function ImportDeclaration(node, state) {
@@ -125,7 +148,7 @@ function createGraphFromFileHelper(sign, resolveFile, buildTree, g, jsFile) {
         ast = _ref2[1];
 
     g.setNode(jsFile, sign(content));
-    return buildTree(content, ast, g, jsFile).then(function (deps) {
+    return buildTree(ast, g, jsFile).then(function (deps) {
       return Promise.all(deps.map(function (dep) {
         return createGraphFromFileHelper(sign, resolveFile, buildTree, g, dep);
       }));

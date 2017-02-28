@@ -79,5 +79,14 @@ describe('Parser', () => {
         { v: '../../node_modules/acorn/package.json', w: 'testNpm' },
       ]));
     });
+
+    it('handles files with extension like names', () => {
+      return createGraphFromFile(createPath('ext_source'), s, {})
+        .then((g) => verifyGraph(g, [
+          'ext_source', 'ext_import.min.js'
+        ], [
+          { v: 'ext_import.min.js', w: 'ext_source' },
+        ]));
+    });
   });
 });
