@@ -139,7 +139,10 @@ function createGraphFromFileHelper(sign, resolveFile, buildTree, g, jsFile) {
 
   // we don't want to parse those files, this is a leaf
   if (path.basename(jsFile) === 'package.json') {
-    return Promise.resolve(g);
+    return loadFile(jsFile).then(function (content) {
+      g.setNode(jsFile, sign(content));
+      return g;
+    });
   }
 
   return resolveFile(jsFile, content).then(function (_ref) {

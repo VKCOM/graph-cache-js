@@ -73,11 +73,12 @@ describe('Parser', () => {
     it('handles npm deps', () => {
       return createGraphFromFile(createPath('testNpm'), s, {
         packageJSON: './package.json'
-      }).then((g) => verifyGraph(g, [
+      }).then((g) => {
+        verifyGraph(g, [
         'testNpm', '../../node_modules/acorn/package.json'
       ], [
         { v: '../../node_modules/acorn/package.json', w: 'testNpm' },
-      ]));
+      ])})
     });
 
     it('handles files with extension like names', () => {
