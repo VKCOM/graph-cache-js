@@ -1,6 +1,7 @@
+/* eslint-env mocha */
+
 const { createGraphFromFile } = require('../../lib/parser');
 const { expect } = require('chai');
-const Graph = require('graphlib').Graph;
 const path = require('path');
 
 function s(t) {
@@ -19,7 +20,7 @@ function verifyGraph(g, vertexList, edgeList = []) {
   let nodes = g.nodes().sort();
   let edges = g.edges().sort((a, b) => a.v <= b.v);
 
-  edgeList = edgeList.map(e => ({ v: createPath(e.v), w: createPath(e.w) }))
+  edgeList = edgeList.map((e) => ({ v: createPath(e.v), w: createPath(e.w) }))
     .sort((a, b) => a.v <= b.v);
   vertexList = vertexList.map(createPath).sort();
 
@@ -39,7 +40,6 @@ describe('Parser', () => {
     });
 
     it('creates 3 file graph', () => {
-
       return createGraphFromFile(createPath('test3'), s, {})
         .then((g) => verifyGraph(g, [
           'test1', 'test2', 'test3'

@@ -7,6 +7,9 @@
   "env": {
     "node": true
   },
+  "globals": {
+    "Promise": true
+  },
   "extends": ["google"],
   "rules": {
     "require-jsdoc": "off",
