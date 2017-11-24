@@ -89,5 +89,15 @@ describe('Parser', () => {
           { v: 'ext_import.min.js', w: 'ext_source' },
         ]));
     });
+
+    it('handles files with not js extensions', () => {
+      return createGraphFromFile(createPath('test_html'), s, {})
+        .then((g) => verifyGraph(g, [
+          'test/test.html', 'test2.js', 'test_html.js'
+        ], [
+          { v: 'test2.js', w: 'test_html.js' },
+          { v: 'test/test.html', w: 'test_html.js' }
+        ]));
+    });
   });
 });
