@@ -75,9 +75,9 @@ describe('Parser', () => {
         packageJSON: './package.json'
       }).then((g) => {
         verifyGraph(g, [
-        'testNpm', '../../node_modules/acorn/package.json'
+        'testNpm', '../../node_modules/babylon/package.json'
       ], [
-        { v: '../../node_modules/acorn/package.json', w: 'testNpm' },
+        { v: '../../node_modules/babylon/package.json', w: 'testNpm' },
       ])})
     });
 

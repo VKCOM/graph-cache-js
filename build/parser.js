@@ -5,11 +5,8 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 var Graph = require('graphlib').Graph;
 var fs = require('fs');
 var path = require('path');
-var acorn = require('acorn');
-
-var _require = require('acorn/dist/walk'),
-    simple = _require.simple;
-
+var babylon = require('babylon');
+var walk = require('babylon-walk');
 var memoize = require('lodash.memoize');
 
 function fileExist(path) {
@@ -96,7 +93,7 @@ function resolveName(opts, loadPackageFile, curFile, depFile) {
 
 function buildTree(resolveName, ast, g, filePath) {
   var state = [];
-  simple(ast, {
+  walk.simple(ast, {
     ImportDeclaration: function ImportDeclaration(node, state) {
       state.push(resolveName(filePath, node.source.value).then(function (newName) {
         // we already handled this file as dep
@@ -114,7 +111,7 @@ function buildTree(resolveName, ast, g, filePath) {
         return false;
       }));
     }
-  }, false, state);
+  }, state);
   return Promise.all(state).then(function (deps) {
     return deps.filter(function (el) {
       return !!el;
@@ -123,7 +120,11 @@ function buildTree(resolveName, ast, g, filePath) {
 }
 
 function parseFile(opts, fileContent) {
-  return acorn.parse(fileContent, { ecmaVersion: 7, sourceType: 'module' });
+  return babylon.parse(fileContent, {
+    ecmaVersion: 7,
+    sourceType: 'module',
+    plugins: ["jsx", "flow"]
+  });
 }
 
 function resolveModule(opts, parser, jsFile) {
