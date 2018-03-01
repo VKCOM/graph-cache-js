@@ -123,7 +123,7 @@ function parseFile(opts, fileContent) {
   return babylon.parse(fileContent, {
     ecmaVersion: 7,
     sourceType: 'module',
-    plugins: ["jsx", "flow"]
+    plugins: ["jsx", "classProperties", "flow"]
   });
 }
 
