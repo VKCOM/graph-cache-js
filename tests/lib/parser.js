@@ -99,5 +99,14 @@ describe('Parser', () => {
           { v: 'test/test.html', w: 'test_html.js' }
         ]));
     });
+
+    it('handles files with php extension', () => {
+      return createGraphFromFile(createPath('test_php'), s, {})
+        .then((g) => verifyGraph(g, [
+          'test/test.php', 'test_php.js'
+        ], [
+          { v: 'test/test.php', w: 'test_php.js' }
+        ]));
+    });
   });
 });

@@ -146,6 +146,13 @@ function createGraphFromFileHelper(sign, resolveFile, buildTree, g, jsFile) {
     });
   }
 
+  if (jsFile.match(/\.php$/)) {
+    return loadFile(jsFile).then(function (content) {
+      g.setNode(jsFile, sign(content));
+      return g;
+    });
+  }
+
   return resolveFile(jsFile, content).then(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 2),
         content = _ref2[0],
