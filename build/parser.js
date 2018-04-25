@@ -120,10 +120,12 @@ function buildTree(resolveName, ast, g, filePath) {
 }
 
 function parseFile(opts, fileContent) {
+  var plugins = opts && Array.isArray(opts.plugins) ? opts.plugins : [];
+
   return babylon.parse(fileContent, {
     ecmaVersion: 7,
     sourceType: 'module',
-    plugins: ["jsx", "classProperties", "flow"]
+    plugins: plugins
   });
 }
 
