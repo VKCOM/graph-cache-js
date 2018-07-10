@@ -58,7 +58,44 @@ function resolveNpmDep(packageFile, json, depFile) {
   }
 }
 
-function resolveName(opts, loadPackageFile, curFile, depFile) {
+function resolveName(opts, alias, loadPackageFile, curFile, depFile) {
+  if (alias) {
+    var error = false;
+
+    alias.some(function (item) {
+      if (depFile.indexOf(item.key) !== 0) return;
+
+      if (item.exactMatch) {
+        if (item.key !== depFile) {
+          error = true;
+        } else {
+          depFile = item.value;
+        }
+
+        return true;
+      }
+
+      depFile = path.normalize(depFile.replace(item.key, item.value));
+
+      // Convert to relative path.
+      // An alternative would be to handle absolute paths in general case as well
+      if (path.isAbsolute(depFile)) {
+        depFile = path.relative(path.dirname(curFile), depFile);
+      }
+
+      // path.normalize extracts `./`
+      if (depFile[0] !== '.') {
+        depFile = './' + depFile;
+      }
+
+      return true;
+    });
+
+    if (error) {
+      return Promise.reject(cantResolveError(depFile));
+    }
+  }
+
   if (depFile[0] === '.') {
     var extName = '';
     if (!path.extname(depFile)) {
@@ -177,13 +214,45 @@ function loadJSON(file) {
   });
 }
 
+// To be compatible with webpack, logic take from:
+// https://github.com/webpack/enhanced-resolve/blob/49cddd1c5757849b1e0b53b9c765525b840c3b59/lib/ResolverFactory.js#L127s
+function prepareAlias(alias) {
+  if (!alias) {
+    return null;
+  }
+
+  return Object.keys(alias).map(function (key) {
+    var exactMatch = false;
+    var obj = alias[key];
+
+    if (key[key.length - 1] === '$') {
+      exactMatch = true;
+      key = key.slice(0, key.length - 1);
+    }
+
+    if (typeof obj === 'string') {
+      obj = {
+        value: obj
+      };
+    }
+
+    obj = Object.assign({
+      key: key,
+      exactMatch: exactMatch
+    }, obj);
+
+    return obj;
+  });
+}
+
 function createGraphFromFile(filename, sign, opts) {
   var file = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
   var g = new Graph({ directed: true });
   var parser = parseFile.bind(null, opts);
+  var alias = prepareAlias(opts.alias);
   var resolveFile = resolveModule.bind(null, opts, parser);
-  var resolve = resolveName.bind(null, opts, memoize(loadJSON));
+  var resolve = resolveName.bind(null, opts, alias, memoize(loadJSON));
   var build = buildTree.bind(null, resolve);
   return createGraphFromFileHelper(sign, resolveFile, build, g, filename, file);
 }
