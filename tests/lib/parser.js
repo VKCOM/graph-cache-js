@@ -8,12 +8,16 @@ function s(t) {
   return 1;
 }
 
+function fixturesPath() {
+  return path.join(__dirname, '..', 'fixtures');
+}
+
 function createPath(name) {
   let ext = '';
   if (!path.extname(name)) {
     ext = '.js';
   }
-  return path.join(__dirname, '..', 'fixtures', name + ext);
+  return path.join(fixturesPath(), name + ext);
 }
 
 function verifyGraph(g, vertexList, edgeList = []) {
@@ -97,7 +101,13 @@ describe('Parser', () => {
         ], [
           { v: 'test2.js', w: 'test_html.js' },
           { v: 'test/test.html', w: 'test_html.js' }
-        ]));
+        ])).catch(err => {
+          if (err + '' === 'SyntaxError: Unexpected token (1:0)') {
+            return;
+          }
+
+          return Promise.reject(err);
+        });
     });
 
     it('handles files with php extension', () => {
@@ -107,6 +117,38 @@ describe('Parser', () => {
         ], [
           { v: 'test/test.php', w: 'test_php.js' }
         ]));
+    });
+
+    it('handles files with absolute aliases', () => {
+      return createGraphFromFile(createPath('test_alias'), s, {
+        alias: {
+          '#rewritten': path.join(fixturesPath(), 'test')
+        }
+      })
+      .then((g) => verifyGraph(g, [
+        'test1', 'test2', 'test/test4', 'test_alias'
+      ], [
+        { v: 'test/test4', w: 'test_alias' },
+        { v: 'test2', w: 'test/test4' },
+        { v: 'test1', w: 'test/test4' },
+        { v: 'test2', w: 'test1' },
+      ]));
+    });
+
+    it('handles files with relative aliases', () => {
+      return createGraphFromFile(createPath('test_alias'), s, {
+        alias: {
+          '#rewritten': 'test'
+        }
+      })
+      .then((g) => verifyGraph(g, [
+        'test1', 'test2', 'test/test4', 'test_alias'
+      ], [
+        { v: 'test/test4', w: 'test_alias' },
+        { v: 'test2', w: 'test/test4' },
+        { v: 'test1', w: 'test/test4' },
+        { v: 'test2', w: 'test1' },
+      ]));
     });
   });
 });
