@@ -3,6 +3,7 @@
 const { createGraphFromFile } = require('../../lib/parser');
 const { expect } = require('chai');
 const path = require('path');
+const fs = require('fs');
 
 function s(t) {
   return 1;
@@ -17,9 +18,16 @@ function createPath(name) {
   if (!path.extname(name)) {
     ext = '.js';
   }
-  return path.join(fixturesPath(), name + ext);
-}
 
+  let newPath = path.join(fixturesPath(), name + ext);
+  const exist = fs.existsSync(newPath);
+
+  if (!exist) {
+    newPath = path.join(fixturesPath(), name + path.sep + 'index.js');
+  }
+
+  return newPath;
+}
 function verifyGraph(g, vertexList, edgeList = []) {
   let nodes = g.nodes().sort();
   let edges = g.edges().sort((a, b) => a.v <= b.v);
@@ -83,6 +91,23 @@ describe('Parser', () => {
       ], [
         { v: '../../node_modules/babylon/package.json', w: 'testNpm' },
       ])})
+    });
+
+    it("handles npm deps with namespace", () => {
+      return createGraphFromFile(createPath("namespace/test"), s, {
+        packageJSON: "./tests/fixtures/namespace/package.json"
+      }).then(g => {
+        verifyGraph(
+          g,
+          [
+            "namespace/test",
+            "../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json"
+          ],
+          [
+            {v: "../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json", w: "namespace/test" }
+          ]
+        );
+      });
     });
 
     it('handles files with extension like names', () => {
@@ -149,6 +174,20 @@ describe('Parser', () => {
         { v: 'test1', w: 'test/test4' },
         { v: 'test2', w: 'test1' },
       ]));
+    });
+
+    it('handles path to folder without index.js', () => {
+      return createGraphFromFile(createPath('testFolder'), s, {}).then(g =>
+        verifyGraph(
+          g,
+          ['testFolder', 'folder', 'folder/module', 'folder/module2'],
+          [
+            { v: 'folder/module', w: 'folder' },
+            { v: 'folder/module2', w: 'folder' },
+            { v: 'folder', w: 'testFolder.js' }
+          ]
+        )
+      );
     });
   });
 });

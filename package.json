@@ -1,12 +1,11 @@
 {
   "name": "graph-cache-js",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "mocha ./tests/lib/*.js -A",
-    "test-watch": "mocha ./tests/lib/*.js -w -A",
-    "build": "babel --presets es2015 -d build/ lib/"
+    "test-watch": "mocha ./tests/lib/*.js -w -A"
   },
   "author": "Termina1",
   "license": "MIT",
