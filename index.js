@@ -1,4 +1,4 @@
-const Parser = require('./build/parser');
+const Parser = require('./lib/parser');
 const createGraphFromFile = Parser.createGraphFromFile;
 
 module.exports = function(opts) {

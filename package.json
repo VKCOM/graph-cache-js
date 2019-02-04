@@ -6,7 +6,6 @@
   "scripts": {
     "test": "mocha ./tests/lib/*.js -A",
     "test-watch": "mocha ./tests/lib/*.js -w -A",
-    "build": "babel --presets es2015 -d build/ lib/"
   },
   "author": "Termina1",
   "license": "MIT",
