@@ -48,7 +48,7 @@ function resolveNpmDep(packageFile, json, depFile) {
   var packageFileResolve = path.resolve(packageFile);
 
   if (root.indexOf('@') === 0) {
-    root += path.sep + depFile.split(path.sep)[1]
+    root += path.sep + depFile.split(path.sep)[1];
   }
 
   var exist = Object.keys(json.dependencies).filter(function (el) {
@@ -136,7 +136,14 @@ function buildTree(resolveName, ast, g, filePath) {
   var state = [];
   walk.simple(ast, {
     ImportDeclaration: function ImportDeclaration(node, state) {
-      state.push(resolveName(filePath, node.source.value).then(function (newName) {
+      state.push(resolveName(filePath, node.source.value).then(async function (newName) {
+        var exist = await fileExist(newName);
+
+        if (!exist) {
+          var parsed = path.parse(newName);
+          newName = parsed.dir + path.sep + parsed.name + path.sep + 'index.js';
+        }
+
         // we already handled this file as dep
         if (g.hasEdge(newName, filePath)) {
           return false;
