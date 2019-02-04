@@ -93,18 +93,21 @@ describe('Parser', () => {
       ])})
     });
 
-    it('handles path to folder without index.js', () => {
-      return createGraphFromFile(createPath('testFolder'), s, {}).then(g =>
+    it("handles npm deps with namespace", () => {
+      return createGraphFromFile(createPath("namespace/test"), s, {
+        packageJSON: "./tests/fixtures/namespace/package.json"
+      }).then(g => {
         verifyGraph(
           g,
-          ['testFolder', 'folder', 'folder/module', 'folder/module2'],
           [
-            { v: 'folder/module', w: 'folder' },
-            { v: 'folder/module2', w: 'folder' },
-            { v: 'folder', w: 'testFolder.js' }
+            "namespace/test",
+            "../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json"
+          ],
+          [
+            {v: "../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json", w: "namespace/test" }
           ]
-        )
-      );
+        );
+      });
     });
 
     it('handles files with extension like names', () => {

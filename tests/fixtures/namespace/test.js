@@ -1,1 +1,1 @@
-import connect from '@vkontakte/vkui-connect'
+import connect from '@vkontakte/vkui-connect';

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha ./tests/lib/*.js -A",
-    "test-watch": "mocha ./tests/lib/*.js -w -A",
+    "test-watch": "mocha ./tests/lib/*.js -w -A"
   },
   "author": "Termina1",
   "license": "MIT",
