@@ -47,6 +47,10 @@ function resolveNpmDep(packageFile, json, depFile) {
   var root = depFile.split(path.sep)[0];
   var packageFileResolve = path.resolve(packageFile);
 
+  if (root.indexOf('@') === 0) {
+    root += path.sep + depFile.split(path.sep)[1]
+  }
+
   var exist = Object.keys(json.dependencies).filter(function (el) {
     return el === root;
   }).length;
