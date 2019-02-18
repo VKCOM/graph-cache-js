@@ -189,5 +189,23 @@ describe('Parser', () => {
         )
       );
     });
+
+    it('supports require statement', () => {
+      return createGraphFromFile(createPath('test_require'), s, {})
+        .then((g) => verifyGraph(g, [
+          'test_require', 'test2'
+        ], [
+          { v: 'test2', w: 'test_require' }
+        ]));
+    });
+
+    it('supports require statement with declaration', () => {
+      return createGraphFromFile(createPath('test_require2'), s, {})
+        .then((g) => verifyGraph(g, [
+          'test_require2', 'test2'
+        ], [
+          { v: 'test2', w: 'test_require2' }
+        ]));
+    });
   });
 });
