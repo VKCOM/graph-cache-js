@@ -207,5 +207,14 @@ describe('Parser', () => {
           { v: 'test2', w: 'test_require2' }
         ]));
     });
+
+    it('supports core node js modules', () => {
+      return createGraphFromFile(createPath('test-core'), s, {})
+        .then((g) => verifyGraph(g, [
+          'test-core', 'test-core2'
+        ], [
+          { v: 'test-core2', w: 'test-core' }
+        ]));
+    });
   });
 });
