@@ -66,8 +66,8 @@ describe('Parser', () => {
         .then((g) => verifyGraph(g, [
           'test1', 'test2', 'test/test4'
         ], [
-          { v: 'test2', w: 'test/test4' },
           { v: 'test1', w: 'test/test4' },
+          { v: 'test2', w: 'test/test4' },
           { v: 'test2', w: 'test1' },
         ]));
     });
@@ -77,8 +77,8 @@ describe('Parser', () => {
         .then((g) => verifyGraph(g, [
           'cyclic1', 'cyclic2'
         ], [
-          { v: 'cyclic1', w: 'cyclic2' },
           { v: 'cyclic2', w: 'cyclic1' },
+          { v: 'cyclic1', w: 'cyclic2' },
         ]));
     });
 
@@ -154,8 +154,8 @@ describe('Parser', () => {
         'test1', 'test2', 'test/test4', 'test_alias'
       ], [
         { v: 'test/test4', w: 'test_alias' },
-        { v: 'test2', w: 'test/test4' },
         { v: 'test1', w: 'test/test4' },
+        { v: 'test2', w: 'test/test4' },
         { v: 'test2', w: 'test1' },
       ]));
     });
@@ -167,11 +167,11 @@ describe('Parser', () => {
         }
       })
       .then((g) => verifyGraph(g, [
-        'test1', 'test2', 'test/test4', 'test_alias'
+        'test2', 'test1', 'test/test4', 'test_alias'
       ], [
         { v: 'test/test4', w: 'test_alias' },
-        { v: 'test2', w: 'test/test4' },
         { v: 'test1', w: 'test/test4' },
+        { v: 'test2', w: 'test/test4' },
         { v: 'test2', w: 'test1' },
       ]));
     });
@@ -182,21 +182,22 @@ describe('Parser', () => {
           g,
           ['testFolder', 'folder', 'folder/module', 'folder/module2'],
           [
+            { v: 'folder', w: 'testFolder.js' },
             { v: 'folder/module', w: 'folder' },
-            { v: 'folder/module2', w: 'folder' },
-            { v: 'folder', w: 'testFolder.js' }
+            { v: 'folder/module2', w: 'folder' }
           ]
         )
       );
     });
 
+    
     it('supports require statement', () => {
       return createGraphFromFile(createPath('test_require'), s, {})
-        .then((g) => verifyGraph(g, [
-          'test_require', 'test2'
-        ], [
-          { v: 'test2', w: 'test_require' }
-        ]));
+      .then((g) => verifyGraph(g, [
+        'test_require', 'test2'
+      ], [
+        { v: 'test2', w: 'test_require' }
+      ]));
     });
 
     it('supports require statement with declaration', () => {
