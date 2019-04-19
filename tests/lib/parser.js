@@ -200,6 +200,12 @@ describe('Parser', () => {
       ]));
     });
 
+    it ('supports nesting in import statement', () => {
+      return createGraphFromFile(createPath('testNested'), s, {
+        packageJSON: './package.json'
+      })
+    })
+
     it('supports require statement with declaration', () => {
       return createGraphFromFile(createPath('test_require2'), s, {})
         .then((g) => verifyGraph(g, [
