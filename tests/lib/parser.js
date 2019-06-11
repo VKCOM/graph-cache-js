@@ -224,5 +224,23 @@ describe('Parser', () => {
           { v: 'test-core2', w: 'test-core' }
         ]));
     });
+
+    it('supports export with import statement', () => {
+      return createGraphFromFile(createPath('import_export'), s, {})
+        .then((g) => verifyGraph(g, [
+          'import_export', 'test2'
+        ], [
+          { v: 'test2', w: 'import_export' }
+        ]));
+    });
+
+    it('supports export with import all statement', () => {
+      return createGraphFromFile(createPath('import_export_all'), s, {})
+        .then((g) => verifyGraph(g, [
+          'import_export_all', 'test2'
+        ], [
+          { v: 'test2', w: 'import_export_all' }
+        ]));
+    });
   });
 });
