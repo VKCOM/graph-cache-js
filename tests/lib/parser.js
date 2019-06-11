@@ -87,24 +87,25 @@ describe('Parser', () => {
         packageJSON: './package.json'
       }).then((g) => {
         verifyGraph(g, [
-        'testNpm', '../../node_modules/babylon/package.json'
-      ], [
-        { v: '../../node_modules/babylon/package.json', w: 'testNpm' },
-      ])})
+          'testNpm', '../../node_modules/babylon/package.json'
+        ], [
+          { v: '../../node_modules/babylon/package.json', w: 'testNpm' },
+        ]);
+      });
     });
 
-    it("handles npm deps with namespace", () => {
-      return createGraphFromFile(createPath("namespace/test"), s, {
-        packageJSON: "./tests/fixtures/namespace/package.json"
-      }).then(g => {
+    it('handles npm deps with namespace', () => {
+      return createGraphFromFile(createPath('namespace/test'), s, {
+        packageJSON: './tests/fixtures/namespace/package.json'
+      }).then((g) => {
         verifyGraph(
           g,
           [
-            "namespace/test",
-            "../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json"
+            'namespace/test',
+            '../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json'
           ],
           [
-            {v: "../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json", w: "namespace/test" }
+            { v: '../fixtures/namespace/node_modules/@vkontakte/vkui-connect/package.json', w: 'namespace/test' }
           ]
         );
       });
@@ -126,7 +127,7 @@ describe('Parser', () => {
         ], [
           { v: 'test2.js', w: 'test_html.js' },
           { v: 'test/test.html', w: 'test_html.js' }
-        ])).catch(err => {
+        ])).catch((err) => {
           if (err + '' === 'SyntaxError: Unexpected token (1:0)') {
             return;
           }
@@ -177,7 +178,7 @@ describe('Parser', () => {
     });
 
     it('handles path to folder without index.js', () => {
-      return createGraphFromFile(createPath('testFolder'), s, {}).then(g =>
+      return createGraphFromFile(createPath('testFolder'), s, {}).then((g) =>
         verifyGraph(
           g,
           ['testFolder', 'folder', 'folder/module', 'folder/module2'],
@@ -190,7 +191,7 @@ describe('Parser', () => {
       );
     });
 
-    
+
     it('supports require statement', () => {
       return createGraphFromFile(createPath('test_require'), s, {})
       .then((g) => verifyGraph(g, [
@@ -200,11 +201,11 @@ describe('Parser', () => {
       ]));
     });
 
-    it ('supports nesting in import statement', () => {
+    it('supports nesting in import statement', () => {
       return createGraphFromFile(createPath('testNested'), s, {
         packageJSON: './package.json'
-      })
-    })
+      });
+    });
 
     it('supports require statement with declaration', () => {
       return createGraphFromFile(createPath('test_require2'), s, {})
