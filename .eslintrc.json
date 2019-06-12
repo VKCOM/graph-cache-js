@@ -1,6 +1,6 @@
 {
   "parserOptions": {
-    "ecmaVersion": 7,
+    "ecmaVersion": 2018,
     "sourceType": "module",
     "ecmaFeatures": {}
   },
@@ -10,6 +10,9 @@
   "globals": {
     "Promise": true
   },
+  "overrides": [{
+    "excludedFiles": "tests/fixtures/**/*.js"
+  }],
   "extends": ["google"],
   "rules": {
     "require-jsdoc": "off",
