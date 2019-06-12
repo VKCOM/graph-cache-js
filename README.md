@@ -19,13 +19,14 @@ const gcache = createGraphCache(parser.bind(null, parserOptions), sign, {});
 ```
 
 ### Parser options
-- packageJSON — path to package.json which you use in your project, so that parser could walk dependencies from npm.
-Important!
+- ```packageJSON``` — path to package.json which you use in your project, so that parser could walk dependencies from npm.
+
+**Important!**
 It will only store and check versions of packets from npm. 
-It won't walk your whole dependencie tree, so if you change files inside your node_modules — parser won't be able to detect those changes 
+It won't walk your whole dependencies  tree, so if you change files inside your node_modules — parser won't be able to detect those changes 
 without changing version of the packet you're importing.
-- plugins — list of plugins for bablylon or now babel-parser (https://babeljs.io/docs/en/babel-parser)
-- alias — alias section from webpack config
+- ```plugins``` — list of plugins for bablylon or now babel-parser (https://babeljs.io/docs/en/babel-parser)
+- ```alias``` — alias section from webpack config
 
 ## Testing
 
