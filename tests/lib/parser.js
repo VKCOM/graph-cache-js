@@ -242,5 +242,12 @@ describe('Parser', () => {
           { v: 'test2', w: 'import_export_all' }
         ]));
     });
+
+    it('supports export without import', () => {
+      return createGraphFromFile(createPath('export_negative'), s, {})
+        .then((g) => verifyGraph(g, [
+          'export_negative'
+        ], []));
+    });
   });
 });
