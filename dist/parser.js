@@ -32,7 +32,7 @@ function loadFile(file, cnt) {
         return Promise.resolve(cnt);
     }
     return new Promise(function (resolve, reject) {
-        fs.readFile(file, { encoding: 'utf-8' }, function (err, result) {
+        fs.readFile(file, function (err, result) {
             if (err) {
                 reject(err);
             }
@@ -130,6 +130,8 @@ function _addEdge(resolveName, g, filePath, edgePath) {
             newName,
             path.join(parsed.dir, parsed.name + '.ts'),
             path.join(parsed.dir, parsed.name + '.tsx'),
+            path.join(parsed.dir, parsed.name, 'index.ts'),
+            path.join(parsed.dir, parsed.name, 'index.tsx'),
             path.join(parsed.dir, parsed.name, 'index.js')
         ];
         for (var _i = 0, pathsToCheck_1 = pathsToCheck; _i < pathsToCheck_1.length; _i++) {
@@ -215,7 +217,7 @@ function createGraphFromFileHelper(sign, resolveFile, buildTree, g, jsFile, cont
         g.setNode(jsFile, sign(content));
         return buildTree(ast, g, jsFile).then(function (deps) {
             return Promise.all(deps.map(function (dep) {
-                return createGraphFromFileHelper(sign, resolveFile, buildTree, g, dep);
+                return createGraphFromFileHelper(sign, resolveFile, buildTree, g, dep, false);
             }));
         }).then(function () { return g; });
     });

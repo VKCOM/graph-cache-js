@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": false,
     "moduleResolution": "node",
     "target": "es5",
     "noImplicitAny": true,

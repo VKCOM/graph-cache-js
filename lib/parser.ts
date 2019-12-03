@@ -20,11 +20,11 @@ type Opts = {
   packageJSON: string;
 };
 type ParserFunc = (content: string) => ts.Node;
-type SignFunc = (content: string) => any; /* TODO */
+type SignFunc = (content: Buffer) => number; /* unsigned int */
 
 type BuildTreeFunc = (rootNode: ts.Node, g: Graph, jsFile: string) => Promise<string[]>;
 type ResolverFunc = (filePath: string, edgePath: string) => Promise<string>;
-type FileResolverFunc = (filePath: string, content: string | false) => Promise<[string, ts.Node]>;
+type FileResolverFunc = (filePath: string, content: Buffer | false) => Promise<[Buffer, ts.Node]>;
 type LoadPackageFunc = (packageJsonPath: string) => Promise<JsonDeps>;
 
 function fileExist(path: string) {
@@ -37,12 +37,12 @@ function fileExist(path: string) {
 }
 
 // TODO: resolving files with webpack options
-function loadFile(file: string, cnt: string | false = false): Promise<string> {
+function loadFile(file: string, cnt: Buffer | false = false): Promise<Buffer> {
   if (cnt !== false) {
     return Promise.resolve(cnt);
   }
   return new Promise((resolve, reject) => {
-    fs.readFile(file, { encoding: 'utf-8' }, (err, result) => {
+    fs.readFile(file, (err, result) => {
       if (err) {
         reject(err);
       } else {
@@ -154,6 +154,8 @@ function _addEdge(resolveName: ResolverFunc, g: Graph, filePath: string, edgePat
       newName,
       path.join(parsed.dir, parsed.name + '.ts'),
       path.join(parsed.dir, parsed.name + '.tsx'),
+      path.join(parsed.dir, parsed.name, 'index.ts'),
+      path.join(parsed.dir, parsed.name, 'index.tsx'),
       path.join(parsed.dir, parsed.name, 'index.js')
     ];
 
@@ -189,13 +191,13 @@ function buildTree(resolveName: ResolverFunc, rootNode: ts.Node, g: Graph, fileP
     switch (node.kind) {
       case ts.SyntaxKind.ImportDeclaration:
         n = node as ts.ImportDeclaration;
-        let text = (n.moduleSpecifier as any).text;
+        let text = (n.moduleSpecifier as ts.StringLiteral).text;
         state.push(addEdge(filePath, text));
         break;
       case ts.SyntaxKind.ExportDeclaration:
         n = node as ts.ExportDeclaration;
         if (n.moduleSpecifier) {
-          let text = (n.moduleSpecifier as any).text;
+          let text = (n.moduleSpecifier as ts.StringLiteral).text;
           state.push(addEdge(filePath, text));
         }
         break;
@@ -222,13 +224,13 @@ function parseFile(opts: Opts, fileContent: string): ts.Node {
   return ts.createSourceFile('tmp', fileContent, ts.ScriptTarget.ES5);
 }
 
-function resolveModule(parser: ParserFunc, jsFile: string, content: string | false = false): Promise<[string, ts.Node]> {
+function resolveModule(parser: ParserFunc, jsFile: string, content: Buffer | false = false): Promise<[Buffer, ts.Node]> {
   return loadFile(jsFile, content).then((content) => {
     return [content, parser(content.toString())];
   });
 }
 
-function createGraphFromFileHelper(sign: SignFunc, resolveFile: FileResolverFunc, buildTree: BuildTreeFunc, g: Graph, jsFile: string, content: string | false = false): Promise<Graph> {
+function createGraphFromFileHelper(sign: SignFunc, resolveFile: FileResolverFunc, buildTree: BuildTreeFunc, g: Graph, jsFile: string, content: Buffer | false = false): Promise<Graph> {
   // we don't want to parse those files, this is a leaf
   if (path.basename(jsFile) === 'package.json') {
     return loadFile(jsFile).then((content) => {
@@ -248,7 +250,7 @@ function createGraphFromFileHelper(sign: SignFunc, resolveFile: FileResolverFunc
     g.setNode(jsFile, sign(content));
     return buildTree(ast, g, jsFile).then((deps) => {
       return Promise.all(deps.map((dep) => {
-        return createGraphFromFileHelper(sign, resolveFile, buildTree, g, dep);
+        return createGraphFromFileHelper(sign, resolveFile, buildTree, g, dep, false);
       }));
     }).then(() => g);
   });
@@ -282,11 +284,11 @@ function prepareAlias(alias: { [key: string]: string | Alias }): Alias[] | null 
   });
 }
 
-function createGraphFromFile(filename: string, sign: SignFunc, opts: Opts, file: string | false = false): Promise<Graph> {
+function createGraphFromFile(filename: string, sign: SignFunc, opts: Opts, file: Buffer | false = false): Promise<Graph> {
   const g = new Graph({ directed: true });
   const parser: ParserFunc = (content: string) => parseFile(opts, content);
   const alias = prepareAlias(opts.alias) || [];
-  const resolveFile: FileResolverFunc = (jsFile: string, content: string | false = false) => resolveModule(parser, jsFile, content);
+  const resolveFile: FileResolverFunc = (jsFile: string, content: Buffer | false = false) => resolveModule(parser, jsFile, content);
   const resolve: ResolverFunc = (curFile: string, depFile: string) => resolveName(opts, alias, memoize(loadJSON), curFile, depFile);
   const build: BuildTreeFunc = (rootNode: ts.Node, g: Graph, filePath: string) => buildTree(resolve, rootNode, g, filePath);
   return createGraphFromFileHelper(sign, resolveFile, build, g, filename, file);
