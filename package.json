@@ -1,25 +1,34 @@
 {
   "name": "@vkontakte/graph-cache-js",
-  "version": "2.5.0",
+  "version": "3.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "yarn run install-deps && mocha ./tests/lib/*.js -A",
+    "lint": "eslint lib/*",
+    "build": "tsc -p .",
+    "test": "yarn run install-deps && yarn run lint && yarn run build && mocha ./tests/lib/*.js -A",
     "test-watch": "mocha ./tests/lib/*.js -w -A",
-    "install-deps": "cd ./tests/fixtures/namespace && npm install "
+    "install-deps": "cd ./tests/fixtures/namespace && npm install"
   },
   "author": "Termina1",
   "license": "MIT",
   "devDependencies": {
+    "@types/graphlib": "^2.1.5",
+    "@types/lodash": "^4.14.149",
+    "@types/lodash.memoize": "^4.1.6",
+    "@types/node": "^12.12.14",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
+    "@vkontakte/eslint-config": "1.0.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^6.2.2",
-    "eslint-config-google": "^0.13.0",
-    "mocha": "^6.1.4"
+    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react-hooks": "^2.0.1",
+    "mocha": "^6.1.4",
+    "typescript": "^3.7.2"
   },
   "dependencies": {
-    "babylon": "^6.18.0",
-    "babylon-walk": "^1.0.2",
     "graphlib": "^2.1.7",
     "lodash.memoize": "^4.1.2",
     "uuid": "^3.3.2"

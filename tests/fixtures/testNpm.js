@@ -1,4 +1,4 @@
-import acorn from 'babylon/lib/index';
-import acorn2 from 'babylon';
+import Graph from 'graphlib/lib/graph';
+import Graph from 'graphlib';
 
 let t = 42;
