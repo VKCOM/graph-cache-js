@@ -1,12 +1,12 @@
 import { Graph } from 'graphlib';
 import * as fs from 'fs';
-import * as ts from "typescript";
+import * as ts from 'typescript';
 import * as path from 'path';
 const memoize = require('lodash.memoize');
 
 type JsonDeps = {
-  dependencies: { [key: string]: unknown }
-}
+  dependencies: { [key: string]: unknown };
+};
 
 type Alias = {
   key: string;
@@ -15,10 +15,10 @@ type Alias = {
 };
 
 type Opts = {
-  plugins: Array<unknown>; // TODO
+  plugins: unknown[]; // TODO
   alias: { [key: string]: string | Alias };
   packageJSON: string;
-}
+};
 type ParserFunc = (content: string) => ts.Node;
 type SignFunc = (content: string) => any; /* TODO */
 
@@ -60,7 +60,7 @@ function resolveNpmDep(packageFile: string, json: JsonDeps, depFile: string) {
   let root = depFile.split(path.sep)[0];
   const packageFileResolve = path.resolve(packageFile);
 
-  if (root.indexOf('@') === 0) {
+  if (root.startsWith('@')) {
     root += path.sep + depFile.split(path.sep)[1];
   }
 
@@ -79,7 +79,7 @@ function resolveName(opts: Opts, alias: Alias[], loadPackageFile: LoadPackageFun
     let error = false;
 
     alias.some((item) => {
-      if (depFile.indexOf(item.key) !== 0) return;
+      if (!depFile.startsWith(item.key)) return;
 
       if (item.exactMatch) {
         if (item.key !== depFile) {
@@ -100,7 +100,7 @@ function resolveName(opts: Opts, alias: Alias[], loadPackageFile: LoadPackageFun
       }
 
       // path.normalize extracts `./`
-      if (depFile[0] !== '.') {
+      if (!depFile.startsWith('.')) {
         depFile = './' + depFile;
       }
 
@@ -112,7 +112,7 @@ function resolveName(opts: Opts, alias: Alias[], loadPackageFile: LoadPackageFun
     }
   }
 
-  if (depFile[0] === '.') {
+  if (depFile.startsWith('.')) {
     let extName = '';
     if (!path.extname(depFile)) {
       extName = '.js';
@@ -181,7 +181,7 @@ function _addEdge(resolveName: ResolverFunc, g: Graph, filePath: string, edgePat
 }
 
 function buildTree(resolveName: ResolverFunc, rootNode: ts.Node, g: Graph, filePath: string): Promise<string[]> {
-  const state: Promise<string | false>[] = [];
+  const state: Array<Promise<string | false>> = [];
   const addEdge = (filePath: string, edgePath: string) => _addEdge(resolveName, g, filePath, edgePath);
 
   function traverseChildren(node: ts.Node) {
@@ -269,7 +269,7 @@ function prepareAlias(alias: { [key: string]: string | Alias }): Alias[] | null 
     let exactMatch = false;
     let value = alias[key];
 
-    if (key[key.length - 1] === '$') {
+    if (key.endsWith('$')) {
       exactMatch = true;
       key = key.slice(0, key.length - 1);
     }

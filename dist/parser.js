@@ -48,7 +48,7 @@ function cantResolveError(name) {
 function resolveNpmDep(packageFile, json, depFile) {
     var root = depFile.split(path.sep)[0];
     var packageFileResolve = path.resolve(packageFile);
-    if (root.indexOf('@') === 0) {
+    if (root.startsWith('@')) {
         root += path.sep + depFile.split(path.sep)[1];
     }
     var exist = Object.keys(json.dependencies)
@@ -64,7 +64,7 @@ function resolveName(opts, alias, loadPackageFile, curFile, depFile) {
     if (alias) {
         var error_1 = false;
         alias.some(function (item) {
-            if (depFile.indexOf(item.key) !== 0)
+            if (!depFile.startsWith(item.key))
                 return;
             if (item.exactMatch) {
                 if (item.key !== depFile) {
@@ -82,7 +82,7 @@ function resolveName(opts, alias, loadPackageFile, curFile, depFile) {
                 depFile = path.relative(path.dirname(curFile), depFile);
             }
             // path.normalize extracts `./`
-            if (depFile[0] !== '.') {
+            if (!depFile.startsWith('.')) {
                 depFile = './' + depFile;
             }
             return true;
@@ -91,7 +91,7 @@ function resolveName(opts, alias, loadPackageFile, curFile, depFile) {
             return Promise.reject(cantResolveError(depFile));
         }
     }
-    if (depFile[0] === '.') {
+    if (depFile.startsWith('.')) {
         var extName = '';
         if (!path.extname(depFile)) {
             extName = '.js';
@@ -232,7 +232,7 @@ function prepareAlias(alias) {
     return Object.keys(alias).map(function (key) {
         var exactMatch = false;
         var value = alias[key];
-        if (key[key.length - 1] === '$') {
+        if (key.endsWith('$')) {
             exactMatch = true;
             key = key.slice(0, key.length - 1);
         }
