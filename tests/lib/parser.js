@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-const { createGraphFromFile } = require('../../lib/parser');
+const { createGraphFromFile } = require('../../dist/parser');
 const { expect } = require('chai');
 const path = require('path');
 const fs = require('fs');
@@ -87,9 +87,9 @@ describe('Parser', () => {
         packageJSON: './package.json'
       }).then((g) => {
         verifyGraph(g, [
-          'testNpm', '../../node_modules/babylon/package.json'
+          'testNpm', '../../node_modules/graphlib/package.json'
         ], [
-          { v: '../../node_modules/babylon/package.json', w: 'testNpm' },
+          { v: '../../node_modules/graphlib/package.json', w: 'testNpm' },
         ]);
       });
     });
@@ -125,8 +125,8 @@ describe('Parser', () => {
         .then((g) => verifyGraph(g, [
           'test/test.html', 'test2.js', 'test_html.js'
         ], [
-          { v: 'test2.js', w: 'test_html.js' },
-          { v: 'test/test.html', w: 'test_html.js' }
+          { v: 'test/test.html', w: 'test_html.js' },
+          { v: 'test2.js', w: 'test_html.js' }
         ])).catch((err) => {
           if (err + '' === 'SyntaxError: Unexpected token (1:0)') {
             return;
